@@ -2,49 +2,118 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>С ДНЕМ РОЖДЕНИЯ</title>
     <style>
-        body {
-            text-align: center;
-            background-color: black;
-            color: white;
-            font-family: Arial;
-            margin-top: 50px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body {
+            min-height: 100vh;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* картинка без всяких урезок — как в оригинале, но адаптивная */
         img {
             max-width: 90%;
+            width: auto;
+            height: auto;
             border-radius: 20px;
-            box-shadow: 0 0 20px white;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* КНОПКА-ЗНАЧОК ПО ЦЕНТРУ ЭКРАНА (fixed) */
+        .music-btn {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #ff9900;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #000;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            z-index: 10000;
+            box-shadow: 0 0 20px rgba(255,150,0,0.8), 0 4px 12px rgba(0,0,0,0.3);
+            transition: 0.1s linear;
+            white-space: nowrap;
+        }
+
+        /* легкий эффект нажатия */
+        .music-btn:active {
+            transform: translate(-50%, -50%) scale(0.96);
+        }
+
+        /* на мобильных чуть уменьшим кнопку, но она остаётся читаемой */
+        @media (max-width: 550px) {
+            .music-btn {
+                padding: 10px 22px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* исчезновение через display: none (после клика) */
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
 
+    <!-- картинка ровно как в исходном коде: src="67.jpg" без лишних обёрток и текста -->
     <img src="67.jpg" alt="С днём рождения!">
 
-    <audio id="myAudio" loop autoplay>
+    <audio id="myAudio" loop preload="auto">
         <source src="67.mp3" type="audio/mpeg">
+        Ваш браузер не поддерживает аудио.
     </audio>
 
+    <!-- значок по центру экрана -->
+    <button id="musicTrigger" class="music-btn">🎵 Включить музыку</button>
+
     <script>
-        var audio = document.getElementById("myAudio");
-        audio.volume = 1.0;
-        // Если браузер заблокирует autoplay, показываем кнопку
-        audio.play().catch(function(error) {
-            var btn = document.createElement("button");
-            btn.innerHTML = "🎵 Нажми, чтобы включить музыку";
-            btn.style.marginTop = "30px";
-            btn.style.padding = "10px 20px";
-            btn.style.fontSize = "18px";
-            btn.style.background = "#ff9900";
-            btn.style.border = "none";
-            btn.style.borderRadius = "30px";
-            btn.onclick = function() {
-                audio.play();
-                btn.style.display = "none";
-            };
-            document.body.appendChild(btn);
-        });
+        (function() {
+            const btn = document.getElementById('musicTrigger');
+            const audio = document.getElementById('myAudio');
+            let clicked = false;
+
+            if (!btn || !audio) return;
+
+            function startMusicAndHide() {
+                if (clicked) return;
+                clicked = true;
+
+                // запускаем музыку
+                audio.play().catch(e => {
+                    // если вдруг ошибка (редко при жесте), но кнопку всё равно прячем
+                    console.log("audio play error:", e);
+                });
+
+                // прячем кнопку (исчезает навсегда)
+                btn.classList.add('hidden');
+            }
+
+            // клик / тап — всё работает на любом устройстве
+            btn.addEventListener('click', startMusicAndHide);
+            // дополнительно для touch-устройств, чтобы гарантированно
+            btn.addEventListener('touchstart', startMusicAndHide, { passive: false });
+        })();
     </script>
 
 </body>
